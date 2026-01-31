@@ -1,0 +1,158 @@
+'use client'
+
+import { useEffect } from 'react'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import { Building } from '../app/types'
+
+// Fix for default marker icons in Next.js
+delete (L.Icon.Default.prototype as any)._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
+
+interface MapProps {
+  buildings: Building[]
+  selectedBuilding: Building | null
+  onBuildingClick: (building: Building) => void
+}
+
+// Component to handle map view changes
+function MapController({ selectedBuilding }: { selectedBuilding: Building | null }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (selectedBuilding) {
+      map.flyTo(
+        [selectedBuilding.coordinates[1], selectedBuilding.coordinates[0]],
+        17,
+        { duration: 1 }
+      )
+    }
+  }, [selectedBuilding, map])
+
+  return null
+}
+
+export default function Map({ buildings, selectedBuilding, onBuildingClick }: MapProps) {
+  // Waterloo campus center coordinates [lat, lng] for Leaflet
+  const WATERLOO_CENTER: [number, number] = [43.4715, -80.5444]
+
+  // Create custom markers
+  const createCustomIcon = (building: Building) => {
+    const color = building.status === 'open' ? '#10b981' : '#ef4444'
+    return L.divIcon({
+      className: 'custom-marker',
+      html: `<div style="
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: ${color};
+        border: 2px solid #ffffff;
+        box-shadow: 0 0 10px ${color}80;
+        cursor: pointer;
+      "></div>`,
+      iconSize: [12, 12],
+      iconAnchor: [6, 6],
+    })
+  }
+
+  return (
+    <div className="relative w-full h-screen">
+      <MapContainer
+        center={WATERLOO_CENTER}
+        zoom={16}
+        style={{ height: '100%', width: '100%' }}
+        className="z-0"
+      >
+        {/* Dark theme tile layer - CartoDB Dark Matter */}
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        />
+
+        <MapController selectedBuilding={selectedBuilding} />
+
+        {buildings.map(building => (
+          <Marker
+            key={building.id}
+            position={[building.coordinates[1], building.coordinates[0]]}
+            icon={createCustomIcon(building)}
+            eventHandlers={{
+              click: () => onBuildingClick(building),
+            }}
+          >
+            <Popup>
+              <div className="text-black">
+                <strong>{building.name}</strong>
+                <br />
+                <span className={building.status === 'open' ? 'text-green-600' : 'text-red-600'}>
+                  {building.status === 'open' ? 'Open' : 'Closed'}
+                </span>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+
+        <MapControls />
+      </MapContainer>
+    </div>
+  )
+}
+
+// Controls component that needs to be inside MapContainer
+function MapControls() {
+  const map = useMap()
+
+  const handleReset = () => {
+    map.flyTo([43.4715, -80.5444], 16, { duration: 1 })
+  }
+
+  const handleFlyToMe = () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser')
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        map.flyTo(
+          [position.coords.latitude, position.coords.longitude],
+          17,
+          { duration: 1 }
+        )
+      },
+      error => {
+        console.error('Error getting location:', error)
+        alert('Unable to get your location')
+      }
+    )
+  }
+
+  return (
+    <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+      <button
+        onClick={handleReset}
+        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        Reset Map
+      </button>
+      <button
+        onClick={handleFlyToMe}
+        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        Fly to Me
+      </button>
+    </div>
+  )
+}

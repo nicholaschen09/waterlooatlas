@@ -1,0 +1,13 @@
+Placeholder images directory
+
+Add building images here with filenames matching the image paths in app/api/buildings/route.ts:
+- dc.jpg
+- mc.jpg
+- qnc.jpg
+- eit.jpg
+- slc.jpg
+- dana.jpg
+- pac.jpg
+- hh.jpg
+
+Or update the image paths in the API route to point to external URLs or remove the image property to use placeholders.
