@@ -3,14 +3,13 @@
 import { useState, useEffect } from 'react'
 import Map from '../components/Map'
 import Sidebar from '../components/Sidebar'
-import { Building, SortOption, FilterOption } from './types'
+import { Building } from './types'
 
 export default function Home() {
   const [buildings, setBuildings] = useState<Building[]>([])
   const [filteredBuildings, setFilteredBuildings] = useState<Building[]>([])
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
-  const [sortBy, setSortBy] = useState<SortOption>('name')
-  const [filterBy, setFilterBy] = useState<FilterOption>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     fetch('/api/buildings')
@@ -25,40 +24,29 @@ export default function Home() {
   useEffect(() => {
     let filtered = [...buildings]
 
-    // Apply filter
-    if (filterBy === 'open') {
-      filtered = filtered.filter(b => b.status === 'open')
-    } else if (filterBy === 'closed') {
-      filtered = filtered.filter(b => b.status === 'closed')
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        building =>
+          building.name.toLowerCase().includes(query) ||
+          building.category?.toLowerCase().includes(query) ||
+          building.location.toLowerCase().includes(query)
+      )
     }
 
-    // Apply sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name)
-        case 'rating':
-          return b.rating - a.rating
-        case 'distance':
-          return (a.distance || 0) - (b.distance || 0)
-        default:
-          return 0
-      }
-    })
+    // Sort by name by default
+    filtered.sort((a, b) => a.name.localeCompare(b.name))
 
     setFilteredBuildings(filtered)
-  }, [buildings, sortBy, filterBy])
+  }, [buildings, searchQuery])
 
   const handleBuildingClick = (building: Building) => {
     setSelectedBuilding(building)
   }
 
-  const handleSortChange = (sort: SortOption) => {
-    setSortBy(sort)
-  }
-
-  const handleFilterChange = (filter: FilterOption) => {
-    setFilterBy(filter)
+  const handleSearchChange = (query: string) => {
+    setSearchQuery(query)
   }
 
   return (
@@ -67,8 +55,7 @@ export default function Home() {
         buildings={filteredBuildings}
         selectedBuilding={selectedBuilding}
         onBuildingSelect={handleBuildingClick}
-        onSortChange={handleSortChange}
-        onFilterChange={handleFilterChange}
+        onSearchChange={handleSearchChange}
       />
       <div className="flex-1 relative">
         <Map

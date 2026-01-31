@@ -2,26 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { Building, SortOption, FilterOption } from '../app/types'
+import { Building } from '../app/types'
 
 interface SidebarProps {
   buildings: Building[]
   selectedBuilding: Building | null
   onBuildingSelect: (building: Building) => void
-  onSortChange: (sort: SortOption) => void
-  onFilterChange: (filter: FilterOption) => void
+  onSearchChange: (query: string) => void
 }
 
 export default function Sidebar({
   buildings,
   selectedBuilding,
   onBuildingSelect,
-  onSortChange,
-  onFilterChange,
+  onSearchChange,
 }: SidebarProps) {
   const [currentTime, setCurrentTime] = useState(new Date())
-  const [sortBy, setSortBy] = useState<SortOption>('name')
-  const [filterBy, setFilterBy] = useState<FilterOption>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,22 +45,18 @@ export default function Sidebar({
     return building.hours[day] || null
   }
 
-  const handleSortChange = (newSort: SortOption) => {
-    setSortBy(newSort)
-    onSortChange(newSort)
-  }
-
-  const handleFilterChange = (newFilter: FilterOption) => {
-    setFilterBy(newFilter)
-    onFilterChange(newFilter)
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value
+    setSearchQuery(query)
+    onSearchChange(query)
   }
 
   return (
     <div className="w-96 h-screen bg-[#0a0a0a] border-r border-gray-800 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-800 flex-shrink-0">
-        <div className="flex items-end gap-2 mb-6">
-          <div className="w-3 h-3 rounded-full bg-blue-400 mb-1"></div>
+        <div className="flex items-center gap-2 mb-6">
+          <div className="w-3 h-3 rounded-full bg-blue-400 mt-0.5"></div>
           <h1 className="text-2xl font-semibold text-white">uwatlas</h1>
         </div>
 
@@ -87,26 +80,28 @@ export default function Sidebar({
           {formatDate(currentTime)}
         </div>
 
-        {/* Sort and Filter */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => handleSortChange(sortBy === 'name' ? 'name' : 'name')}
-            className="flex items-center gap-2 border border-gray-700 hover:border-gray-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+        {/* Search Bar */}
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search buildings..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 pl-10 text-white placeholder-gray-500 focus:outline-none focus:border-gray-600 transition-colors"
+          />
+          <svg
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            Name
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          <button
-            onClick={() => handleFilterChange(filterBy === 'all' ? 'all' : 'all')}
-            className="flex items-center gap-2 border border-gray-700 hover:border-gray-600 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            All
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
       </div>
 
