@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Building } from '../types'
+import { Building } from '../../types'
 
 // Waterloo campus buildings data
 // Coordinates are for University of Waterloo main campus

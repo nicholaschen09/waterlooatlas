@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -35,6 +35,69 @@ function MapController({ selectedBuilding }: { selectedBuilding: Building | null
   }, [selectedBuilding, map])
 
   return null
+}
+
+// Component to show user's current location
+function UserLocationMarker() {
+  const [position, setPosition] = useState<[number, number] | null>(null)
+
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      return
+    }
+
+    // Get initial position
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setPosition([pos.coords.latitude, pos.coords.longitude])
+      },
+      (error) => {
+        console.error('Error getting location:', error)
+      }
+    )
+
+    // Watch position for updates
+    const watchId = navigator.geolocation.watchPosition(
+      (pos) => {
+        setPosition([pos.coords.latitude, pos.coords.longitude])
+      },
+      (error) => {
+        console.error('Error watching location:', error)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      }
+    )
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId)
+    }
+  }, [])
+
+  if (!position) return null
+
+  // Create blue dot icon for user location
+  const userLocationIcon = L.divIcon({
+    className: 'user-location-marker',
+    html: `<div style="
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background-color: #3b82f6;
+      box-shadow: 0 0 10px rgba(59, 130, 246, 0.6);
+      cursor: pointer;
+    "></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+  })
+
+  return (
+    <Marker position={position} icon={userLocationIcon}>
+      <Popup>Your location</Popup>
+    </Marker>
+  )
 }
 
 export default function Map({ buildings, selectedBuilding, onBuildingClick }: MapProps) {
@@ -74,6 +137,9 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
         />
 
         <MapController selectedBuilding={selectedBuilding} />
+
+        {/* User's current location */}
+        <UserLocationMarker />
 
         {buildings.map(building => (
           <Marker
@@ -118,24 +184,46 @@ function MapControls() {
 
     navigator.geolocation.getCurrentPosition(
       position => {
+        const lat = position.coords.latitude
+        const lng = position.coords.longitude
         map.flyTo(
-          [position.coords.latitude, position.coords.longitude],
+          [lat, lng],
           17,
-          { duration: 1 }
+          { 
+            duration: 1.5,
+            animate: true
+          }
         )
       },
       error => {
         console.error('Error getting location:', error)
-        alert('Unable to get your location')
+        let errorMessage = 'Unable to get your location'
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable.'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out. Please try again.'
+            break
+        }
+        alert(errorMessage)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
       }
     )
   }
 
   return (
-    <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+    <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000] pointer-events-auto">
       <button
         onClick={handleReset}
-        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 pointer-events-auto"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -144,7 +232,8 @@ function MapControls() {
       </button>
       <button
         onClick={handleFlyToMe}
-        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+        type="button"
+        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 pointer-events-auto"
       >
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
