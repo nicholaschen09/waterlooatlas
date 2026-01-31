@@ -1,9 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Map from '../components/Map'
+import dynamic from 'next/dynamic'
 import Sidebar from '../components/Sidebar'
 import { Building } from './types'
+
+// Dynamically import Map component to prevent SSR issues with Leaflet
+const Map = dynamic(() => import('../components/Map'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="text-gray-400">Loading map...</div>
+    </div>
+  ),
+})
 
 export default function Home() {
   const [buildings, setBuildings] = useState<Building[]>([])
