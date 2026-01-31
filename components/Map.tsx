@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
-import L from 'leaflet'
+import L, { Map as LeafletMap } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { Building } from '../app/types'
 
@@ -103,6 +103,7 @@ function UserLocationMarker() {
 export default function Map({ buildings, selectedBuilding, onBuildingClick }: MapProps) {
   // Waterloo campus center coordinates [lat, lng] for Leaflet
   const WATERLOO_CENTER: [number, number] = [43.4715, -80.5444]
+  const [map, setMap] = useState<LeafletMap | null>(null)
 
   // Create custom markers
   const createCustomIcon = (building: Building) => {
@@ -122,6 +123,57 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
     })
   }
 
+  const handleReset = () => {
+    if (map) {
+      map.flyTo([43.4715, -80.5444], 16, { duration: 1 })
+    }
+  }
+
+  const handleFlyToMe = () => {
+    if (!map) return
+
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser')
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        const lat = position.coords.latitude
+        const lng = position.coords.longitude
+        map.flyTo(
+          [lat, lng],
+          17,
+          {
+            duration: 1.5,
+            animate: true
+          }
+        )
+      },
+      error => {
+        console.error('Error getting location:', error)
+        let errorMessage = 'Unable to get your location'
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
+            break
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = 'Location information is unavailable.'
+            break
+          case error.TIMEOUT:
+            errorMessage = 'Location request timed out. Please try again.'
+            break
+        }
+        alert(errorMessage)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
+  }
+
   return (
     <div className="relative w-full h-screen">
       <MapContainer
@@ -129,6 +181,7 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
         zoom={16}
         style={{ height: '100%', width: '100%' }}
         className="z-0"
+        ref={setMap}
       >
         {/* Dark theme tile layer - CartoDB Dark Matter */}
         <TileLayer
@@ -161,86 +214,32 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
             </Popup>
           </Marker>
         ))}
-
-        <MapControls />
       </MapContainer>
+
+      {/* Controls outside MapContainer */}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+        <button
+          onClick={handleReset}
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Reset Map
+        </button>
+        <button
+          onClick={handleFlyToMe}
+          type="button"
+          className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          Fly to Me
+        </button>
+      </div>
     </div>
   )
 }
 
-// Controls component that needs to be inside MapContainer
-function MapControls() {
-  const map = useMap()
-
-  const handleReset = () => {
-    map.flyTo([43.4715, -80.5444], 16, { duration: 1 })
-  }
-
-  const handleFlyToMe = () => {
-    if (!navigator.geolocation) {
-      alert('Geolocation is not supported by your browser')
-      return
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        const lat = position.coords.latitude
-        const lng = position.coords.longitude
-        map.flyTo(
-          [lat, lng],
-          17,
-          { 
-            duration: 1.5,
-            animate: true
-          }
-        )
-      },
-      error => {
-        console.error('Error getting location:', error)
-        let errorMessage = 'Unable to get your location'
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
-            break
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = 'Location information is unavailable.'
-            break
-          case error.TIMEOUT:
-            errorMessage = 'Location request timed out. Please try again.'
-            break
-        }
-        alert(errorMessage)
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      }
-    )
-  }
-
-  return (
-    <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000] pointer-events-auto">
-      <button
-        onClick={handleReset}
-        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 pointer-events-auto"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-        Reset Map
-      </button>
-      <button
-        onClick={handleFlyToMe}
-        type="button"
-        className="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 pointer-events-auto"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        Fly to Me
-      </button>
-    </div>
-  )
-}

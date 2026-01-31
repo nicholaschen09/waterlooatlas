@@ -17,10 +17,13 @@ export default function Sidebar({
   onBuildingSelect,
   onSearchChange,
 }: SidebarProps) {
-  const [currentTime, setCurrentTime] = useState(new Date())
+  const [currentTime, setCurrentTime] = useState<Date | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
+    // Set initial time on client only to avoid hydration mismatch
+    setCurrentTime(new Date())
+
     const timer = setInterval(() => {
       setCurrentTime(new Date())
     }, 1000)
@@ -40,7 +43,7 @@ export default function Sidebar({
   }
 
   const getCurrentDayHours = (building: Building) => {
-    if (!building.hours) return null
+    if (!building.hours || !currentTime) return null
     const day = currentTime.toLocaleDateString('en-US', { weekday: 'long' })
     return building.hours[day] || null
   }
@@ -77,7 +80,7 @@ export default function Sidebar({
 
         {/* Date and Time */}
         <div className="text-sm text-gray-400 mb-4">
-          {formatDate(currentTime)}
+          {currentTime ? formatDate(currentTime) : '\u00A0'}
         </div>
 
         {/* Search Bar */}
