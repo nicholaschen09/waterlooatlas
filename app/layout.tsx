@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'atlas - University of Waterloo',
+  title: 'uwatlas - University of Waterloo',
   description: 'Interactive campus map for University of Waterloo',
 }
 

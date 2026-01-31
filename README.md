@@ -1,4 +1,4 @@
-# Waterloo Atlas
+# UW Atlas
 
 An interactive campus map for University of Waterloo, inspired by [UofT Atlas](https://www.uoftatlas.com/).
 
