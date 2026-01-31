@@ -1,5 +1,8 @@
 # UW Atlas
 
+<img width="1677" height="932" alt="Screenshot 2026-01-31 at 11 50 20 AM" src="https://github.com/user-attachments/assets/01dd5c5c-8afd-482a-8f7f-8f47288ab86b" />
+
+
 An interactive campus map for University of Waterloo, inspired by [UofT Atlas](https://www.uoftatlas.com/).
 
 ## Features
