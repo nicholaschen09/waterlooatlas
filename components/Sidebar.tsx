@@ -66,7 +66,7 @@ export default function Sidebar({
         {/* Social Links */}
         <div className="flex gap-2 mb-6">
           <a
-            href="https://github.com"
+            href="https://github.com/nicholaschen09/waterlooatlas"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 border border-gray-700 hover:border-gray-500 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
