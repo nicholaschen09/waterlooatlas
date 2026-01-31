@@ -196,6 +196,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5438, 43.4733],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/University_of_Waterloo_Engineering_6_Building_Exterier.jpg/800px-University_of_Waterloo_Engineering_6_Building_Exterier.jpg',
     hours: {
       Monday: '7:00 AM - 11:00 PM',
       Tuesday: '7:00 AM - 11:00 PM',
@@ -232,6 +233,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5413, 43.4705],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Carl_Pollock_Hall.JPG/800px-Carl_Pollock_Hall.JPG',
     hours: {
       Monday: '7:00 AM - 10:00 PM',
       Tuesday: '7:00 AM - 10:00 PM',
@@ -250,6 +252,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5398, 43.4706],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/UWaterloo_-_Douglas_Wright_Engineering_Building.JPG/800px-UWaterloo_-_Douglas_Wright_Engineering_Building.JPG',
     hours: {
       Monday: '7:00 AM - 11:00 PM',
       Tuesday: '7:00 AM - 11:00 PM',
@@ -394,6 +397,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5410, 43.4678],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/University_of_Waterloo_Environmental_Building_3.jpg/800px-University_of_Waterloo_Environmental_Building_3.jpg',
     hours: {
       Monday: '7:00 AM - 10:00 PM',
       Tuesday: '7:00 AM - 10:00 PM',
@@ -412,6 +416,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5465, 43.4677],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Hagey_Hall_of_the_Humanities_%28University_of_Waterloo%29_-_Waterloo%2C_ON.jpg/800px-Hagey_Hall_of_the_Humanities_%28University_of_Waterloo%29_-_Waterloo%2C_ON.jpg',
     hours: {
       Monday: '7:00 AM - 10:00 PM',
       Tuesday: '7:00 AM - 10:00 PM',
@@ -646,6 +651,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5452, 43.4656],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Conrad_Grebel_University_College_-_Waterloo%2C_ON.jpg/800px-Conrad_Grebel_University_College_-_Waterloo%2C_ON.jpg',
     hours: {
       Monday: '8:00 AM - 10:00 PM',
       Tuesday: '8:00 AM - 10:00 PM',
@@ -772,6 +778,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5438, 43.4732],
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/University_of_Waterloo_Mathematics_3.jpg/800px-University_of_Waterloo_Mathematics_3.jpg',
     hours: {
       Monday: '7:00 AM - 11:00 PM',
       Tuesday: '7:00 AM - 11:00 PM',
