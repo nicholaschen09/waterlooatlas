@@ -51,7 +51,6 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
         height: 12px;
         border-radius: 50%;
         background-color: ${color};
-        border: 2px solid #ffffff;
         box-shadow: 0 0 10px ${color}80;
         cursor: pointer;
       "></div>`,
