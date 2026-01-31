@@ -62,8 +62,8 @@ export default function Sidebar({
     <div className="w-96 h-screen bg-[#0a0a0a] border-r border-gray-800 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="p-6 border-b border-gray-800 flex-shrink-0">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-3 h-3 rounded-full bg-blue-400"></div>
+        <div className="flex items-end gap-2 mb-6">
+          <div className="w-3 h-3 rounded-full bg-blue-400 mb-1"></div>
           <h1 className="text-2xl font-semibold text-white">uwatlas</h1>
         </div>
 
@@ -126,7 +126,7 @@ export default function Sidebar({
                 }`}
               >
                 {/* Building Image */}
-                <div className="relative w-full h-32 bg-gray-800">
+                <div className="relative w-full h-32 bg-gray-900 border border-gray-700">
                   {building.image ? (
                     <Image
                       src={building.image}
