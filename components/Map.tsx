@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L, { Map as LeafletMap } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -20,9 +20,13 @@ interface MapProps {
   onBuildingClick: (building: Building) => void
 }
 
-// Component to handle map view changes and open popup
-function MapController({ selectedBuilding, markerRefs }: { selectedBuilding: Building | null, markerRefs: React.MutableRefObject<globalThis.Map<string, any>> }) {
+// Component to capture the map instance and handle view changes
+function MapController({ selectedBuilding, markerRefs, onMapReady }: { selectedBuilding: Building | null, markerRefs: React.MutableRefObject<globalThis.Map<string, any>>, onMapReady: (map: LeafletMap) => void }) {
   const map = useMap()
+
+  useEffect(() => {
+    onMapReady(map)
+  }, [map, onMapReady])
 
   useEffect(() => {
     if (selectedBuilding) {
@@ -34,13 +38,12 @@ function MapController({ selectedBuilding, markerRefs }: { selectedBuilding: Bui
         { duration: 1 }
       )
 
-      // Open popup after animation completes (duration is 1 second)
       const timer = setTimeout(() => {
         const marker = markerRefs.current.get(selectedBuilding.id)
         if (marker) {
           marker.openPopup()
         }
-      }, 1100) // Slightly longer than animation duration
+      }, 1100)
 
       return () => clearTimeout(timer)
     }
@@ -113,10 +116,10 @@ function UserLocationMarker() {
 }
 
 export default function Map({ buildings, selectedBuilding, onBuildingClick }: MapProps) {
-  // Waterloo campus center coordinates [lat, lng] for Leaflet
   const WATERLOO_CENTER: [number, number] = [43.4715, -80.5444]
   const [map, setMap] = useState<LeafletMap | null>(null)
   const markerRefs = useRef<globalThis.Map<string, any>>(new globalThis.Map())
+  const handleMapReady = useCallback((m: LeafletMap) => setMap(m), [])
 
   // Create custom markers
   const createCustomIcon = (building: Building) => {
@@ -194,15 +197,13 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
         zoom={16}
         style={{ height: '100%', width: '100%' }}
         className="z-0"
-        ref={setMap}
       >
-        {/* Dark theme tile layer - CartoDB Dark Matter */}
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
 
-        <MapController selectedBuilding={selectedBuilding} markerRefs={markerRefs} />
+        <MapController selectedBuilding={selectedBuilding} markerRefs={markerRefs} onMapReady={handleMapReady} />
 
         {/* User's current location */}
         <UserLocationMarker />

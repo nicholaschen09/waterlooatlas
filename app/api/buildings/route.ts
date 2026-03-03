@@ -105,7 +105,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5455, 43.4700],
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Dana_Porter_Arts_Library_in_2009.jpg/800px-Dana_Porter_Arts_Library_in_2009.jpg',
+    image: '/dana-porter.png',
     hours: {
       Monday: '8:00 AM - 11:00 PM',
       Tuesday: '8:00 AM - 11:00 PM',
@@ -471,6 +471,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5472, 43.4687],
+    image: '/arts-lecture-hall.png',
     hours: {
       Monday: '7:00 AM - 10:00 PM',
       Tuesday: '7:00 AM - 10:00 PM',
