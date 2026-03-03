@@ -129,19 +129,19 @@ export default function Sidebar({
               <div
                 key={building.id}
                 onClick={() => onBuildingSelect(building)}
-                className={`rounded-lg overflow-hidden border cursor-pointer transition-all ${
+                className={`rounded-lg overflow-hidden border cursor-pointer transition-all group ${
                   isSelected
                     ? 'border-gray-500'
                     : 'border-gray-800 hover:border-gray-600'
                 }`}
               >
-                  <div className="relative w-full h-44">
+                  <div className="relative w-full h-44 overflow-hidden">
                   {building.image ? (
                     <Image
                       src={building.image}
                       alt={building.name}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
                       unoptimized
                       onError={(e) => {
                         e.currentTarget.style.display = 'none'
