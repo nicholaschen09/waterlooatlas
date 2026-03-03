@@ -814,6 +814,7 @@ const buildings: Building[] = [
     status: 'open',
     location: 'University of Waterloo',
     coordinates: [-80.5462, 43.4748],
+    image: '/bc-matthews-hall.png',
     hours: {
       Monday: '7:00 AM - 10:00 PM',
       Tuesday: '7:00 AM - 10:00 PM',
