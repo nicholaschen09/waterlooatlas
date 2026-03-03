@@ -20,6 +20,7 @@ export default function Home() {
   const [filteredBuildings, setFilteredBuildings] = useState<Building[]>([])
   const [selectedBuilding, setSelectedBuilding] = useState<Building | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     fetch('/api/buildings')
@@ -61,13 +62,26 @@ export default function Home() {
 
   return (
     <main className="flex h-screen w-screen overflow-hidden">
-      <Sidebar
-        buildings={filteredBuildings}
-        selectedBuilding={selectedBuilding}
-        onBuildingSelect={handleBuildingClick}
-        onSearchChange={handleSearchChange}
-      />
+      {sidebarOpen && (
+        <Sidebar
+          buildings={filteredBuildings}
+          selectedBuilding={selectedBuilding}
+          onBuildingSelect={handleBuildingClick}
+          onSearchChange={handleSearchChange}
+          onClose={() => setSidebarOpen(false)}
+        />
+      )}
       <div className="flex-1 relative">
+        {!sidebarOpen && (
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="absolute top-4 left-4 z-[1000] bg-gray-800 hover:bg-gray-700 text-white p-2.5 rounded-lg transition-colors shadow-lg"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        )}
         <Map
           buildings={filteredBuildings}
           selectedBuilding={selectedBuilding}

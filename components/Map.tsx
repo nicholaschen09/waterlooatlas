@@ -121,6 +121,15 @@ export default function Map({ buildings, selectedBuilding, onBuildingClick }: Ma
   const markerRefs = useRef<globalThis.Map<string, any>>(new globalThis.Map())
   const handleMapReady = useCallback((m: LeafletMap) => setMap(m), [])
 
+  useEffect(() => {
+    if (!map) return
+    const observer = new ResizeObserver(() => {
+      map.invalidateSize()
+    })
+    observer.observe(map.getContainer())
+    return () => observer.disconnect()
+  }, [map])
+
   // Create custom markers
   const createCustomIcon = (building: Building) => {
     const color = building.status === 'open' ? '#10b981' : '#ef4444'
